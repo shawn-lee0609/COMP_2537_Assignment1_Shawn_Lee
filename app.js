@@ -44,6 +44,7 @@ const node_session_secret = process.env.SESSION_SECRET;
 // Need to change this to connect with mongoDB
 var {database} = require('./databaseConnection');
 
+// Sets the location of the database when the new user is created.
 const userCollection = database.db(mongodb_db).collection('users');
 
 // Middleware for to use req.body it is necessary to parse the data.
@@ -246,9 +247,10 @@ app.post('/signupSubmit', async (req, res) => {
     // To convert the simple text pw into bcrypt by using original pw and saltRounds.
     var hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Pushing a new user information to the array Asynchronously, therefore it waits until
+    // Pushing a new "user" information to the array Asynchronously, therefore it waits until
     // it successfully stores the information in mongoDB.
-    // Storing in the MongoDB so that the information is stored even though we turn off the server
+    // Storing in the MongoDB 'users' database that we setted in line 47
+    // so that the information is stored even though we turn off the server.
     await userCollection.insertOne({username: username, email: email, password: hashedPassword});
 
     // Storing session when user successfully signs up.
