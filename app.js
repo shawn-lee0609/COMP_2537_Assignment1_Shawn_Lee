@@ -86,6 +86,7 @@ app.get('/', (req, res) => {
             <body>
               <div class="container">
                 <button type="button" id="signup">Sign Up</button>
+                <br>
                 <button type="button" id="login">Log in</button>
               </div>
               <script>
@@ -111,7 +112,9 @@ app.get('/', (req, res) => {
             <body>
               <div class="container">
                 <span id="greeting">Hello ${username}!</span>
+                <br>
                 <button type="button" id="members">Go to Members Area</button>
+                <br>
                 <button type="button" id="logout">Logout</button>
               </div>
               <script>
@@ -192,8 +195,11 @@ app.get('/signup', (req,res) => {
     create user
     <form action='/signupSubmit' method='post'>
     <input name='username' type='text' placeholder='name'>
+    <br>
     <input name='email' type='email' placeholder='email'>
+    <br>
     <input name='password' type='password' placeholder='password'>
+    <br>
     <button>Submit</button>
     </form>
     `;
@@ -272,7 +278,9 @@ app.get('/login',(req,res) => {
     log in
     <form action ='/loginSubmit' method = 'post'>
     <input name='email' type='email' placeholder='email'>
+    <br>
     <input name='password' type='password' placeholder='password'>
+    <br>
     <button>Submit</button>
     </form>
     `;
