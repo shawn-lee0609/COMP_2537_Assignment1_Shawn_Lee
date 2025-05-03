@@ -62,6 +62,7 @@ var mongoStore = MongoStore.create({
 
 app.use(session({
     secret: node_session_secret,
+    // Decide where to store the session data
     store: mongoStore, // default is memory store (server side)
     saveUninitialized: false,
     resave: true
@@ -198,6 +199,13 @@ app.get('/signup', (req,res) => {
     res.send(html);
 });
 
+// A POST method.
+// req.body is created by "app.use(express.urlencoded({extended: false}));"
+// now it can parse the information that user inputted from the above code
+// which now the server side can manage with those data.
+{/* <input name="username" …>
+<input name="email" …>
+<input name="password" …> */}
 app.post('/signupSubmit', async (req, res) => {
     var username = req.body.username;
     var email = req.body.email;
@@ -212,7 +220,7 @@ app.post('/signupSubmit', async (req, res) => {
         }
     );
 
-    // Check 
+    // Check if the input follows the condition of the schema(Joi)
     const validationResult = schema.validate({username, email, password}, {abortEarly: false});
 
     if(validationResult.error != null) 
@@ -226,6 +234,8 @@ app.post('/signupSubmit', async (req, res) => {
             .map(f => `${f} is required.`)
             .join(' ');
     
+        // res.send() sends the body(본문) to the client directly.
+        // The URL maintains.    
         res.send(`
             <p>${msgs}</p>
             <a href="/signup">Try again</a>
@@ -236,7 +246,8 @@ app.post('/signupSubmit', async (req, res) => {
     // To convert the simple text pw into bcrypt by using original pw and saltRounds.
     var hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Pushing a new user information to the array (Asynchronous)
+    // Pushing a new user information to the array Asynchronously, therefore it waits until
+    // it successfully stores the information in mongoDB.
     // Storing in the MongoDB so that the information is stored even though we turn off the server
     await userCollection.insertOne({username: username, email: email, password: hashedPassword});
 
@@ -249,6 +260,7 @@ app.post('/signupSubmit', async (req, res) => {
     
     console.log("Inserted user");
 
+    // Changes the URL directly moving to the other route.
     res.redirect('/members');
 });
 
@@ -306,6 +318,7 @@ app.post('/loginSubmit', async (req,res) => {
     // How the log in process works (comparing the username and the password)
     // Since it's like an array, if the length is not 1 this means that it didn't 
     // fetch any of it which is an error.
+    // In this case, it means that there is no user with the given email and the password.
     if(result.length != 1)
     {
         console.log("user not found");
@@ -333,7 +346,7 @@ app.post('/loginSubmit', async (req,res) => {
         console.log("correct password");
         
         // This 3 lines of code is storing the data in the session so that
-        // it can remember the user when they reaccess with the same session.
+        // it can remember the user when they reaccess with the same session (browser).
         // Saving the username as well from the mongoDB so that it can show it in the root page.
         req.session.authenticated = true;
         req.session.email = email;
@@ -345,6 +358,7 @@ app.post('/loginSubmit', async (req,res) => {
     }
     else
     {
+        // When the email exists in the database but it does not matches the password.
 		console.log("incorrect password");
 		res.send(`
             <!DOCTYPE html>
